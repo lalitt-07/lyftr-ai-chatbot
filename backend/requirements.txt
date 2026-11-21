@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+litellm
+python-dotenv
+sqlalchemy
+aiosqlite
+orjson
+soundfile

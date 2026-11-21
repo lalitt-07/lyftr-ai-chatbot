@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: lyftr-backend
+    ports:
+      - "8000:8000"
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_API_KEY_2: ${GOOGLE_API_KEY_2}
+      DATABASE_URL: sqlite:////data/app.db
+      ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      ENABLE_FAILURE_SIMULATION: ${ENABLE_FAILURE_SIMULATION:-true}
+    volumes:
+      - chatbot_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: lyftr-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  chatbot_data:
